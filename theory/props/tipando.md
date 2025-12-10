@@ -1,0 +1,143 @@
+# Tipando las props
+
+Nos ayuda a indicar que tipo de valores son los que tiene que recibir los componentes funcionales y hay varias formas para tiparlos
+
+## Tipado normal
+
+``` js
+function Button(props: {text:string}){
+    return(
+        <button>{props.text}</button>
+    )
+}
+
+function Page() {
+return (
+<div>
+<Button text={{}} />
+</div>
+
+)
+}
+export default Page
+
+```
+
+esto se hace de esta forma ya que al colocar props nada mas entonces tipamos el objeto y le indicamos que tiene un objeto text de string
+
+## Tipado con types
+
+```js
+type ButtonProps = {
+    text:string;
+    subtitle:string;
+    color:string
+}
+
+function Button(props: ButtonProps){
+    return(
+        <button>{props.text}</button>
+    )
+}
+
+```
+
+Aqui definimos un type para indicar que propiedades tiene esta prop asi es mas legible y mas extendible .
+
+## Podemos pasar varias props
+
+No React lo que hace es tomar todas las propiedades que le definimos y agruparlas para convertirlas.
+
+Ejemplo
+
+``` js
+// ❌ Esto NO existe en React
+function Button(props: ButtonProps, text: string) { }
+
+// ✅ Solo puedes recibir UN parámetro: el objeto props
+function Button(props: ButtonProps) { }
+
+// O destructurado (que es lo mismo):
+function Button({name, edad, color}: ButtonProps) { }
+
+```
+
+## Props opcionales
+
+Nosotros no siempre vamos a querer pasar todos los valores o algunos si o otros no, si nosotros sabemos que no todos son obligatorios tenemos que indicar cuales son opcionales de esta forma.
+
+```js
+type ButtonProps = {
+    text:string;
+    subtitle?:string; // ? : este simbolo indica que este parametro es opcional
+    color?:string
+}
+```
+
+# React FC
+
+React tiene otra forma de tipar props que su funcion es ser mas explicita pero vamos a desglozar su historia y porque ya no se recomienda tanto, pero es util saberlo por si algun proyecto lo tiene 
+
+
+
+## Historia
+
+React FC cuando se introdugo tenia cierto problema.
+
+- 1. Solo podia devolver reactElements.
+- 2. El objeto props recibia children aunque no lo usaras
+
+Esto tenia ciertos problemas ya que react permite renderizar varias cosas a esto se le llama ReactNode
+
+``` js
+// ReactNode: TODO lo que React puede renderizar
+type ReactNode = 
+  | ReactElement     // JSX
+  | string           // "texto"
+  | number           // 42
+  | boolean          // true/false
+  | null             
+  | undefined
+  | ReactNode[]      // arrays
+
+```
+
+Pero ReactElement solo puede rendirzar JSX.
+
+## Actualidad
+
+En versiones modernas React FC ya no tiene estas limintaciones lo an arreglado y es perfectamente usado pero ya no se recomienda ya que llega a ser mas verboso.
+
+Ejemplo de FC
+
+``` js
+// TODAS estas formas son válidas y hacen LO MISMO:
+
+// 1️ React.FC
+const Count: React.FC<{count: number}> = ({count}) => {
+  return <div>{count}</div>
+}
+
+// 2️ Props sin destructurar 
+const Count = (prop: {count: number}) => {
+  const {count} = prop
+  return <div>{count}</div>
+}
+
+// 3️⃣ Props con destructuring directo 
+const Count = ({count}: {count: number}) => {
+  return <div>{count}</div>
+}
+
+// 4️⃣ Con type/interface separado 
+type CountProps = {count: number}
+const Count = ({count}: CountProps) => {
+  return <div>{count}</div>
+}
+
+// 5️⃣ Function declaration 
+function Count({count}: {count: number}) {
+  return <div>{count}</div>
+}
+
+```
